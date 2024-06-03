@@ -1,6 +1,6 @@
-module github.com/mysteriumnetwork/http3-client
+module github.com/mysteriumnetwork/http3-proxy
 
-go 1.22.2
+go 1.22
 
 require github.com/quic-go/quic-go v0.44.0
 
