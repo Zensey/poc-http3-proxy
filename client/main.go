@@ -37,18 +37,15 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//testdata.AddRootCA(pool)
 
 	roundTripper := &http3.RoundTripper{
 		TLSClientConfig: &tls.Config{
 			RootCAs:            pool,
 			InsecureSkipVerify: *insecure,
 			KeyLogWriter:       keyLog,
-			
 		},
 		QUICConfig: &quic.Config{
 			Tracer: qlog.DefaultTracer,
-
 		},
 	}
 	defer roundTripper.Close()
@@ -82,5 +79,3 @@ func main() {
 	}
 	wg.Wait()
 }
-
-

@@ -6,11 +6,13 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"math/big"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/quic-go/quic-go/http3"
 )
@@ -33,13 +35,17 @@ func isCertExists() bool {
 
 func generateTLSCert() {
 	key, _ := rsa.GenerateKey(rand.Reader, 1024)
-	template := x509.Certificate{SerialNumber: big.NewInt(1)}
+	template := x509.Certificate{
+		SerialNumber: big.NewInt(1),
+	}
 	certDER, _ := x509.CreateCertificate(rand.Reader, &template, &template, &key.PublicKey, key)
 	keyOut, _ := os.Create("key.pem")
 	defer keyOut.Close()
+
 	pem.Encode(keyOut, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)})
 	certOut, _ := os.Create("cert.pem")
 	defer certOut.Close()
+
 	pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: certDER})
 }
 
@@ -77,6 +83,9 @@ func mkHandler() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		log.Println("h>", r.TLS.ServerName)
+		fmt.Println("h>", r.TLS.ServerName)
+
 		request := prepareProxyRequest(r, r.TLS.ServerName)
 
 		response, err := http3Client.Do(request)
@@ -120,5 +129,5 @@ func main() {
 	if !isCertExists() {
 		generateTLSCert()
 	}
-	http3.ListenAndServe("0.0.0.0:8080", "cert.pem", "key.pem", mkHandler())
+	http3.ListenAndServe("0.0.0.0:8585", "cert.pem", "key.pem", mkHandler())
 }
