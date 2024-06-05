@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"math/big"
@@ -84,7 +83,6 @@ func mkHandler() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("h>", r.TLS.ServerName)
-		fmt.Println("h>", r.TLS.ServerName)
 
 		request := prepareProxyRequest(r, r.TLS.ServerName)
 
